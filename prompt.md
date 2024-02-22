@@ -34,7 +34,6 @@ Web app for creating quizes like "What's the right job for me?" or "What's my pe
    - AnswerID (Integer)
    - QuestionID (Integer)
    - Text (String)
-   - IsCorrect (Boolean, Optional)
 
 5. **AnswerAttribute**
    - AttributeID (Integer)
@@ -56,56 +55,56 @@ Web app for creating quizes like "What's the right job for me?" or "What's my pe
    - AnswerID (Integer)
    - AnsweredAt (DateTime)
 
+8. **AttributeThreshold**
+   - AttributeThresholdID (Integer)
+   - QuizID (Integer)
+   - AttributeName (String)
+   - ThresholdValue (Decimal)
+   - Description (String, Optional)
+   - GradingInstruction (String)
 
+### Current API Endpoints:
 
-## API Endpoints with Data Types and Simplified Responses
-
-### Getting All Quizzes (Simplified)
-- **Endpoint:** `GET /api/quizzes`
+## Getting All Published Quizzes
+- **Endpoint:** `GET /api/quizzes/published`
 - **Function:** Retrieves all published quizzes, returning only quiz names, descriptions, and IDs.
 - **Returns:** JSON array of objects with `QuizID`, `Title`, and `Description`.
 
-### Getting a Quiz by ID
+## Getting All Quiz Categories
+- **Endpoint:** `GET /api/quiz-categories`
+- **Function:** Retrieves a list of all unique quiz categories.
+- **Returns:** JSON array of strings representing the unique categories.
+
+## Getting Published Quizzes by Category
+- **Endpoint:** `GET /api/quizzes/published/{category}`
+- **Function:** Retrieves all published quizzes for a specific category, returning quiz names, descriptions, and IDs.
+- **Parameters:** `category` - The category of the quizzes to retrieve.
+- **Returns:** JSON array of objects with `QuizID`, `Title`, and `Description`.
+
+## Getting Quiz Details by ID
 - **Endpoint:** `GET /api/quizzes/{quizId}`
-- **Function:** Retrieves a specific quiz by its ID, including all its questions and possible answers.
-- **Parameters:** `quizId` (Integer) - The unique identifier for the quiz.
-- **Returns:** JSON object including `QuizID`, `Title`, `Description`, and an array of `Questions` each with `QuestionID`, `Text`, and `Answers`.
+- **Function:** Retrieves detailed information about a specific quiz, including questions and answer options.
+- **Parameters:** `quizId` - The ID of the quiz to retrieve.
+- **Returns:** JSON object with quiz details, including `QuizID`, `Title`, `Description`, `Category`, `Questions` (with `QuestionID`, `Text`, `QuestionType`, `Answers`).
 
-### Creating a Quiz
-- **Endpoint:** `POST /api/quizzes`
-- **Function:** Allows authenticated users to create a new quiz.
-- **Payload:** JSON object containing `Title`, `Description`, and `IsPublished`.
-- **Returns:** JSON object with `QuizID`, `Title`, `Description`.
-
-### Adding Questions to a Quiz
-- **Endpoint:** `POST /api/quizzes/{quizId}/questions`
-- **Function:** Adds a new question to a quiz for authenticated users.
-- **Parameters:** `quizId` (Integer) - The unique identifier for the quiz.
-- **Payload:** JSON object containing `Text`, `QuestionType`, and `Sequence`.
-- **Returns:** JSON object with `QuestionID`, `Text`, `QuestionType`.
-
-### Posting Answers for a Quiz Attempt
-- **Endpoint:** `POST /api/quizzes/{quizId}/attempts`
-- **Function:** Submits answers for a quiz attempt, tracking the attempt's timing.
-- **Parameters:** `quizId` (Integer) - The unique identifier for the quiz.
-- **Payload:** JSON array of `Answers`, each with `QuestionID` and `AnswerID`.
-- **Returns:** JSON object with `AttemptID`, `QuizID`, `UserID`, `StartedAt`, `CompletedAt`.
-
-### Submitting Answers with Attributes for a Quiz Attempt
-- **Endpoint:** `POST /api/quizzes/{quizId}/attempts/{attemptId}/answers`
-- **Function:** Allows submitting answers along with selected attributes for each answer during a quiz attempt.
-- **Parameters:** 
-  - `quizId` (Integer) - The unique identifier for the quiz.
-  - `attemptId` (Integer) - The unique identifier for the attempt.
-- **Payload:** JSON array of objects, each with `QuestionID`, `AnswerID`, and an array of `Attributes` with `AttributeName` and `Weight`.
-- **Returns:** Confirmation of submission, potentially with scores or results based on the quiz logic.
-
-
+## Submitting Quiz Answers
+- **Endpoint:** `POST /api/quizzes/{quizId}/submit`
+- **Function:** Receives the user's answers for a quiz, calculates the result based on answer attributes, and returns the calculated result.
+- **Parameters:** `quizId` - The ID of the quiz being attempted.
+- **Body:** JSON object containing `UserID`, `Answers` (array of objects with `QuestionID` and `AnswerID`).
+- **Returns:** JSON object with the result, including `ResultName`, `ResultDescription`, and any additional advice or recommendations.
 
 
 ### Prompt
 
-Using this data model output an example of a user created MBTI quiz with 3 questions in a codeblock in JSON format as it would be returned from the API. 
+Create endpoints for the following.
+1. Creating a quiz
+2. Adding a question to User's quiz
+3. Adding an AnswerAttribute to an answer from User's quiz
+4. Adding an AttributeThreshold to User's quiz
+5. Updating an AttributeThreshold `ThresholdValue`, `Description`, or `GradingInstruction` of User's quiz
+6. Removing a question from User's quiz
 
+A token will be given to the user and the quizes will be returned from that user's token value.
 
-
+Output your response in a codeblock 
