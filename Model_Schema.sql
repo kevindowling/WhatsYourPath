@@ -1,75 +1,76 @@
--- Users table
 CREATE TABLE Users (
-    UserID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(255) NOT NULL,
     Email VARCHAR(255) NOT NULL UNIQUE,
-    PasswordHash VARCHAR(255) NOT NULL,
+    PasswordHash CHAR(60) NOT NULL, -- Assuming bcrypt is used
     CreatedAt DATETIME NOT NULL,
     LastLogin DATETIME,
-    Role VARCHAR(255)
+    Role VARCHAR(50)
 );
 
--- Quizzes table
-CREATE TABLE Quizzes (
-    QuizID INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE Quiz (
+    QuizID INT AUTO_INCREMENT PRIMARY KEY,
     Title VARCHAR(255) NOT NULL,
-    Description TEXT NOT NULL,
-    CreatedBy INTEGER NOT NULL,
+    Description TEXT,
+    CreatedBy INT NOT NULL,
     CreatedAt DATETIME NOT NULL,
     UpdatedAt DATETIME NOT NULL,
-    IsPublished BOOLEAN NOT NULL DEFAULT false,
+    IsPublished BOOLEAN NOT NULL,
     FOREIGN KEY (CreatedBy) REFERENCES Users(UserID)
 );
 
--- Questions table
-CREATE TABLE Questions (
-    QuestionID INTEGER PRIMARY KEY AUTOINCREMENT,
-    QuizID INTEGER NOT NULL,
-    Text VARCHAR(255) NOT NULL,
+CREATE TABLE Question (
+    QuestionID INT AUTO_INCREMENT PRIMARY KEY,
+    QuizID INT NOT NULL,
+    Text TEXT NOT NULL,
     CreatedAt DATETIME NOT NULL,
-    QuestionType VARCHAR(255) NOT NULL,
-    Sequence INTEGER NOT NULL,
-    FOREIGN KEY (QuizID) REFERENCES Quizzes(QuizID)
+    QuestionType VARCHAR(50) NOT NULL,
+    Sequence INT NOT NULL,
+    FOREIGN KEY (QuizID) REFERENCES Quiz(QuizID)
 );
 
--- Answers table
-CREATE TABLE Answers (
-    AnswerID INTEGER PRIMARY KEY AUTOINCREMENT,
-    QuestionID INTEGER NOT NULL,
-    Text VARCHAR(255) NOT NULL,
-    CreatedAt DATETIME NOT NULL,
-    FOREIGN KEY (QuestionID) REFERENCES Questions(QuestionID)
+CREATE TABLE Answer (
+    AnswerID INT AUTO_INCREMENT PRIMARY KEY,
+    QuestionID INT NOT NULL,
+    Text TEXT NOT NULL,
+    FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID)
 );
 
--- AnswerAttributes table
-CREATE TABLE AnswerAttributes (
-    AttributeID INTEGER PRIMARY KEY AUTOINCREMENT,
-    AnswerID INTEGER NOT NULL,
+CREATE TABLE AnswerAttribute (
+    AttributeID INT AUTO_INCREMENT PRIMARY KEY,
+    AnswerID INT NOT NULL,
     AttributeName VARCHAR(255) NOT NULL,
-    AttributeValue DECIMAL NOT NULL,
-    FOREIGN KEY (AnswerID) REFERENCES Answers(AnswerID)
+    Weight DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (AnswerID) REFERENCES Answer(AnswerID)
 );
 
--- UserQuizAttempts table
-CREATE TABLE UserQuizAttempts (
-    AttemptID INTEGER PRIMARY KEY AUTOINCREMENT,
-    QuizID INTEGER NOT NULL,
-    UserID INTEGER NOT NULL,
+CREATE TABLE UserQuizAttempt (
+    AttemptID INT AUTO_INCREMENT PRIMARY KEY,
+    QuizID INT NOT NULL,
+    UserID INT NOT NULL,
     StartedAt DATETIME NOT NULL,
     CompletedAt DATETIME,
-    Score VARCHAR(255),
-    FOREIGN KEY (QuizID) REFERENCES Quizzes(QuizID),
+    FOREIGN KEY (QuizID) REFERENCES Quiz(QuizID),
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
--- UserAnswers table
-CREATE TABLE UserAnswers (
-    UserAnswerID INTEGER PRIMARY KEY AUTOINCREMENT,
-    AttemptID INTEGER NOT NULL,
-    QuestionID INTEGER NOT NULL,
-    AnswerID INTEGER NOT NULL,
+CREATE TABLE UserAnswer (
+    UserAnswerID INT AUTO_INCREMENT PRIMARY KEY,
+    AttemptID INT NOT NULL,
+    QuestionID INT NOT NULL,
+    AnswerID INT NOT NULL,
     AnsweredAt DATETIME NOT NULL,
-    FOREIGN KEY (AttemptID) REFERENCES UserQuizAttempts(AttemptID),
-    FOREIGN KEY (QuestionID) REFERENCES Questions(QuestionID),
-    FOREIGN KEY (AnswerID) REFERENCES Answers(AnswerID)
+    FOREIGN KEY (AttemptID) REFERENCES UserQuizAttempt(AttemptID),
+    FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID),
+    FOREIGN KEY (AnswerID) REFERENCES Answer(AnswerID)
+);
+
+CREATE TABLE AttributeThreshold (
+    AttributeThresholdID INT AUTO_INCREMENT PRIMARY KEY,
+    QuizID INT NOT NULL,
+    AttributeName VARCHAR(255) NOT NULL,
+    ThresholdValue DECIMAL(10,2) NOT NULL,
+    Description TEXT,
+    GradingInstruction TEXT,
+    FOREIGN KEY (QuizID) REFERENCES Quiz(QuizID)
 );

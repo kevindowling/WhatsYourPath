@@ -17,7 +17,7 @@
 3. **Build the Database**
    - Choose a suitable database management system (DBMS).
    - Install and configure the chosen DBMS.
-   - Create the database schema using Mongo.
+   - Create the database schema using MySQL.
    - Populate the database with initial data if needed.
    - Test the database functionality.
 

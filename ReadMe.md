@@ -16,11 +16,3 @@ This project is dedicated to building a web application that allows users to cre
 2. **Database Setup**: Ensure MongoDB is running and configure the connection string in the project settings.
 3. **Run the Development Server**: Use Django's built-in server for local development and testing.
 
-## Project Structure
-
-- **app/**: Core application files including models, views, and templates.
-- **api/**: RESTful API endpoints.
-- **ai/**: Integration with AI services for quiz assistance.
-- **static/**: Frontend assets like CSS, JavaScript, and images.
-- **tests/**: Unit and integration tests.
-
