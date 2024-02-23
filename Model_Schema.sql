@@ -8,15 +8,25 @@ CREATE TABLE Users (
     Role VARCHAR(50)
 );
 
+CREATE TABLE QuizCategory (
+    QuizCategoryID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Description TEXT,
+    CreatedAt DATETIME NOT NULL,
+    UpdatedAt DATETIME NOT NULL
+);
+
 CREATE TABLE Quiz (
     QuizID INT AUTO_INCREMENT PRIMARY KEY,
     Title VARCHAR(255) NOT NULL,
     Description TEXT,
+    QuizCategoryID INT NOT NULL,
     CreatedBy INT NOT NULL,
     CreatedAt DATETIME NOT NULL,
     UpdatedAt DATETIME NOT NULL,
     IsPublished BOOLEAN NOT NULL,
-    FOREIGN KEY (CreatedBy) REFERENCES Users(UserID)
+    FOREIGN KEY (CreatedBy) REFERENCES Users(UserID),
+    FOREIGN KEY (QuizCategoryID) REFERENCES QuizCategory(QuizCategoryID)
 );
 
 CREATE TABLE Question (

@@ -1,4 +1,3 @@
-
 CREATE TABLE `Users` (
     `UserID` INT AUTO_INCREMENT PRIMARY KEY,
     `Username` VARCHAR(255) NOT NULL,
@@ -9,15 +8,25 @@ CREATE TABLE `Users` (
     `Role` VARCHAR(50) DEFAULT NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE `QuizCategory` (
+    `QuizCategoryID` INT AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(255) NOT NULL,
+    `Description` TEXT DEFAULT NULL,
+    `CreatedAt` DATETIME NOT NULL,
+    `UpdatedAt` DATETIME NOT NULL
+) ENGINE=InnoDB;
+
 CREATE TABLE `Quiz` (
     `QuizID` INT AUTO_INCREMENT PRIMARY KEY,
     `Title` VARCHAR(255) NOT NULL,
     `Description` TEXT,
+    `QuizCategoryID` INT NOT NULL,
     `CreatedBy` INT NOT NULL,
     `CreatedAt` DATETIME NOT NULL,
     `UpdatedAt` DATETIME NOT NULL,
     `IsPublished` BOOLEAN NOT NULL,
-    CONSTRAINT `fk_Quiz_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `Users` (`UserID`)
+    CONSTRAINT `fk_Quiz_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `Users` (`UserID`),
+    CONSTRAINT `fk_Quiz_QuizCategoryID` FOREIGN KEY (`QuizCategoryID`) REFERENCES `QuizCategory` (`QuizCategoryID`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `Question` (
