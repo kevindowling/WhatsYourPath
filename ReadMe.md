@@ -1,8 +1,8 @@
-# Decision-Based Quiz Creation Web App
+# What's Your Path
 
-## Overview
+## Overview of final product
 
-This project is dedicated to building a web application that allows users to create, store, and manage decision-based quizzes and then access the quizes via an api endpoint. It integrates user authentication, a powerful quiz creation interface, database connectivity for data persistence, and RESTful API endpoints for data access. Additionally, it features an AI assistant to streamline quiz creation and enhance user engagement.
+This project is dedicated to building a web application that allows users to create, store, and manage quizzes and then access the quizes via an api endpoint. It integrates user authentication, a powerful quiz creation interface, database connectivity for data persistence, and RESTful API endpoints for data access. Additionally, it features an AI assistant to streamline quiz creation and enhance user engagement. Although, it will be possible to build knowledge focused quizzes, the focus of this app will be more geared towards quizzes like "MBTI" or "Find a Career". 
 
 
 ## Tech Stack
