@@ -3,7 +3,7 @@
 
 ### Getting All Published Quizzes
 - **Endpoint:** `GET /api/quizzes/published`
-- **Function:** Retrieves all published quizzes, returning only quiz names, descriptions, and IDs.
+- **Function:** Retrieves all published quizzes, returning only quiz names, descriptions, categories, and IDs.
 - **Returns:** JSON array of objects with `QuizID`, `Title`, and `Description`.
 
 ### Getting All Quiz Categories
