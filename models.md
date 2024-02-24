@@ -1,13 +1,5 @@
 ### Application Model
-
-**1. User**
-   - UserID (Integer)
-   - Username (String)
-   - Email (String)
-   - PasswordHash (String)
-   - CreatedAt (DateTime)
-   - LastLogin (DateTime, Optional)
-   - Role (String, Optional)
+**1. Removed**
 
 **2. Quiz**
    - QuizID (Integer)
@@ -66,3 +58,37 @@
    - Description (String, Optional)
    - CreatedAt (DateTime)
    - UpdatedAt (DateTime)
+
+
+### Site Model
+
+**1. User**
+- UserID (Integer)
+- Username (String)
+- Email (String)
+- PasswordHash (String)
+- CreatedAt (DateTime)
+- LastLogin (DateTime, Optional)
+- Role (String, Optional)
+- AIQueriesCount (Integer, Optional)
+- AIQueriesLimit (Integer, Optional)
+- LastAIQueryTime (DateTime, Optional)
+- APIAccess (Boolean)
+- SecurityFlags (JSON/Text, Optional)
+
+**2. ActivityLog**
+- LogID (Integer)
+- UserID (ForeignKey, Integer)
+- Timestamp (DateTime)
+- ActivityType (String)
+- Details (JSON/Text)
+
+**3. AIInteractionLog**
+- AIInteractionID (Integer)
+- UserID (ForeignKey, Integer)
+- QueryTime (DateTime)
+- AIQuery (Text)
+- AIResponse (Text, Optional)
+- QueryLimitReached (Boolean)
+- SecurityFlag (Boolean, Optional)
+- Details (JSON/Text, Optional)
