@@ -1,7 +1,8 @@
 
 # Quiz Maker
+**NOT YET ONLINE** 
 
-This is the repository for the [pathfinderquizzes.com](https://pathfinderquizzes.com) **NOT YET ONLINE** project. 
+This is the repository for the [pathfinderquizzes.com](https://pathfinderquizzes.com) project. 
 
 ## Functionality
  - User Registration/Login System
