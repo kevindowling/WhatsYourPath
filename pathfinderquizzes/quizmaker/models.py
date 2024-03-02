@@ -1,0 +1,77 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+class QuizCategory(models.Model):
+    QuizCategoryID = models.AutoField(primary_key=True)
+    Name = models.CharField(max_length=255)
+    Description = models.TextField(null=True, blank=True)
+    CreatedAt = models.DateTimeField(auto_now_add=True)
+    UpdatedAt = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.Name
+
+class Quiz(models.Model):
+    QuizID = models.AutoField(primary_key=True)
+    Title = models.CharField(max_length=255)
+    Description = models.TextField()
+    QuizCategory = models.ForeignKey(QuizCategory, on_delete=models.CASCADE)
+    CreatedBy = models.ForeignKey(User, on_delete=models.CASCADE)
+    CreatedAt = models.DateTimeField(auto_now_add=True)
+    UpdatedAt = models.DateTimeField(auto_now=True)
+    IsPublished = models.BooleanField(default=False)
+    def __str__(self):
+        return self.Title
+
+class Question(models.Model):
+    QuestionID = models.AutoField(primary_key=True)
+    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    Text = models.CharField(max_length=255)
+    CreatedAt = models.DateTimeField(auto_now_add=True)
+    QuestionType = models.CharField(max_length=50)
+    Sequence = models.IntegerField()
+    def __str__(self) -> str:
+        return self.Text
+
+class Answer(models.Model):
+    AnswerID = models.AutoField(primary_key=True)
+    Question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    Text = models.CharField(max_length=255)
+    def __str__(self) -> str:
+        return self.Text
+
+class AnswerAttribute(models.Model):
+    AttributeID = models.AutoField(primary_key=True)
+    Answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    AttributeName = models.CharField(max_length=255)
+    Weight = models.DecimalField(max_digits=5, decimal_places=2)
+    def __str__(self) -> str:
+        return self.AttributeName
+
+class UserQuizAttempt(models.Model):
+    AttemptID = models.AutoField(primary_key=True)
+    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    StartedAt = models.DateTimeField()
+    CompletedAt = models.DateTimeField(null=True, blank=True)
+    def __str__(self) -> str:
+        return f'User: {self.User} attempt at {self.CompletedAt}'
+
+class UserAnswer(models.Model):
+    UserAnswerID = models.AutoField(primary_key=True)
+    Attempt = models.ForeignKey(UserQuizAttempt, on_delete=models.CASCADE)
+    Question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    Answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    AnsweredAt = models.DateTimeField()
+    def __str__(self) -> str:
+        return f'Question {self.Question} answered with {self.Answer} at {self.AnsweredAt}'
+
+class AttributeThreshold(models.Model):
+    AttributeThresholdID = models.AutoField(primary_key=True)
+    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    AttributeName = models.CharField(max_length=255)
+    ThresholdValue = models.DecimalField(max_digits=5, decimal_places=2)
+    Description = models.TextField(null=True, blank=True)
+    GradingInstruction = models.TextField()
+    def __str__(self) -> str:
+        return f'{self.AttributeName} threshold: {self.ThresholdValue}'
+
