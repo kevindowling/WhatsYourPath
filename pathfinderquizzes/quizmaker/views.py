@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Quiz
+from .models import Quiz, QuizCategory
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
@@ -18,5 +18,7 @@ def create_quiz(request):
             CreatedBy=request.user,
             IsPublished=False  # or True, based on your form input
         )
-        return redirect('some-view-name')  # Redirect to a new URL:
-    return render(request, 'quizmaker/create_quiz.html', {})
+        return redirect('')  # Redirect to a new URL:
+    categories = QuizCategory.objects.all()
+    context = {'categories': categories}
+    return render(request, 'quizmaker/create_quiz.html', context)
