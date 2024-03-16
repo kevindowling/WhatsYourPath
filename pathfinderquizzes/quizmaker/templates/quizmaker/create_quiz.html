@@ -1,16 +1,12 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create a Quiz</title>
-  </head>
-<body>
-  <div class="container">
+{% block content %}
+<div class="container">
     <h1>Create a New Quiz</h1>
-    <form method="post">
-      {% csrf_token %}  <div class="form-group">
+    <form method="post" action="{% url 'create_quiz' %}">
+
+      {% csrf_token %}
+      <div class="form-group">
         <label for="title">Quiz Title</label>
         <input type="text" class="form-control" id="title" name="title" placeholder="Enter your quiz title" required>
       </div>
@@ -30,7 +26,7 @@
         </select>
       </div>
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="true" id="is_published" name="is_published">
+        <input class="form-check-input" type="checkbox" value="" id="is_published" name="is_published">
         <label class="form-check-label" for="is_published">
           Publish Quiz (Make it available to users)
         </label>
@@ -39,5 +35,4 @@
       <button type="submit" class="btn btn-primary">Create Quiz</button>
     </form>
   </div>
-</body>
-</html>
+{% endblock %}

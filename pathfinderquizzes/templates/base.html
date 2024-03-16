@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Site{% endblock %}</title>
+    {# Add your CSS files here #}
+</head>
+<body>
+    <header>
+        <nav>
+            <!-- Updated Navigation bar content -->
+            <a href="/">Home</a>
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Signout</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}">Login</a>
+              <a href="{% url 'signup' %}">Signup</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- This block will be overridden by child templates -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <!-- Footer content -->
+        <p>Copyright &copy; 2023 My Site</p>
+    </footer>
+
+    {# Add your JavaScript files here #}
+</body>
+</html>

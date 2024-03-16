@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Add Attributes Thresholds</h1>
+    <form method="post" action="{% url 'submit_attribute_thresholds' %}" id="attributesForm">
+        <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
+        {% csrf_token %}
+      
+        <div id="attribute-thresholds-container">
+            <!-- Dynamic fields will be appended here -->
+        </div>
+        <button type="button" onclick="addAttributeThresholdField()">Add Attribute</button>
+
+        <button type="submit" class="btn btn-primary">Submit Attributes</button>
+    </form>
+</div>
+<script>
+    let attributeThresholdCounter = 0;
+
+    document.getElementById('attributesForm').addEventListener('submit', function(event) {
+        let inputs = document.querySelectorAll('input[type="number"][name^="attribute_threshold"]');
+        for (let i = 0; i < inputs.length; i++) {
+            if (parseFloat(inputs[i].value) > 999.99) {
+                alert('Threshold value cannot be higher than 999.99.');
+                event.preventDefault(); // Prevent form submission
+                return; // Exit the loop and function
+            }
+        }
+    });
+    
+    function addAttributeThresholdField() {
+        attributeThresholdCounter++;
+        let container = document.getElementById('attribute-thresholds-container');
+        let attributeThresholdDiv = document.createElement('div');
+        attributeThresholdDiv.setAttribute('id', 'attributeDiv' + attributeThresholdCounter);
+        attributeThresholdDiv.innerHTML = `
+            <hr>
+            <div class="form-group">
+                <label for="attribute_name${attributeThresholdCounter}">Attribute Name:</label>
+                <input type="text" class="form-control" name="attribute_name${attributeThresholdCounter}" required>
+            </div>
+            <div class="form-group">
+                <label for="attribute_threshold${attributeThresholdCounter}">Threshold:</label>
+                <input type="number" step="any" class="form-control" name="attribute_threshold${attributeThresholdCounter}" required>
+            </div>
+            <div class="form-group">
+                <label for="threshold_description${attributeThresholdCounter}">Threshold Description:</label>
+                <textarea class="form-control" name="threshold_description${attributeThresholdCounter}" rows="2"></textarea>
+            </div>
+            <button type="button" onclick="removeAttributeField('attributeDiv${attributeThresholdCounter}')">Remove Attribute</button>
+        `;
+        container.appendChild(attributeThresholdDiv);
+    }
+    
+    function removeAttributeField(divId) {
+        document.getElementById(divId).remove();
+    }
+</script>
+
+{% endblock %}
