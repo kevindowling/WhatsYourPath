@@ -9,5 +9,6 @@ urlpatterns = [
     path('accounts/signup/', signup, name='signup'),
     path('accounts/profile/', profile, name='profile'),
     path('logout/', logout_view, name='logout'),
+    path('quizzes/', include('quizzes.urls')),
 ]
 

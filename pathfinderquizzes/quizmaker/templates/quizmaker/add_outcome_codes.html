@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Add Outcome Codes to Quiz</h1>
+    <form method="post" action="{% url 'submit_outcome_codes' %}">
+        <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
+        {% csrf_token %}
+
+        <div id="outcome-codes-container">
+            <!-- Dynamic fields for outcome codes will be appended here -->
+        </div>
+        <button type="button" onclick="addOutcomeCodeField()">Add Outcome Code</button>
+        <button type="submit" class="btn btn-primary">Submit Outcome Codes</button>
+    </form>
+
+</div>
+
+<script>
+    let outcomeCodeCounter = 0;
+
+    function addOutcomeCodeField() {
+        outcomeCodeCounter++;
+        let container = document.getElementById('outcome-codes-container');
+        let outcomeCodeDiv = document.createElement('div');
+        outcomeCodeDiv.setAttribute('id', 'outcomeCodeDiv' + outcomeCodeCounter);
+        outcomeCodeDiv.innerHTML = `
+            <hr>
+            <div class="form-group">
+                <label for="combination_code${outcomeCodeCounter}">Combination Code:</label>
+                {% for attribute_name_codes in attribute_names_codes %}
+                    <h4> {{ attribute_name_codes.0 }}
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">
+                            <span class="label-on">{{ attribute_name_codes.1 }}</span>
+                            <span class="label-off">{{ attribute_name_codes.2 }}</span>
+                        </label>
+                    </div>
+
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="description${outcomeCodeCounter}">Description:</label>
+                <textarea class="form-control" name="description${outcomeCodeCounter}" rows="3" required></textarea>
+            </div>
+            <button type="button" onclick="removeOutcomeCodeField('outcomeCodeDiv${outcomeCodeCounter}')">Remove Outcome Code</button>
+            <style>
+                /* Hide the label-off text by default */
+                .label-off {
+                    display: none;
+                }
+
+                /* When the checkbox is not checked, hide label-on and show label-off */
+                #flexSwitchCheckDefault:not(:checked) ~ .form-check-label .label-on {
+                    display: none;
+                }
+
+                #flexSwitchCheckDefault:not(:checked) ~ .form-check-label .label-off {
+                    display: inline;
+                }
+            </style>
+        `;
+        container.appendChild(outcomeCodeDiv);
+    }
+
+    function removeOutcomeCodeField(divId) {
+        document.getElementById(divId).remove();
+    }
+</script>
+
+{% endblock %}
+
+
+

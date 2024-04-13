@@ -13,6 +13,7 @@
         <button type="submit" class="btn btn-primary">Submit Questions</button>
     </form>
 </div>
+
 <script>
     let questionCounter = 0;
     
@@ -52,6 +53,19 @@
                     <label for="answer_text${questionNumber}_${answerCounters[questionNumber]}">Answer:</label>
                     <input type="text" class="form-control" name="answer_text${questionNumber}_${answerCounters[questionNumber]}" required>
                 </div>
+                <div class="form-group">
+                    <label for="answer_attribute${questionNumber}_${answerCounters[questionNumber]}">Attribute:</label>
+                    <select class="form-control" name="answer_attribute${questionNumber}_${answerCounters[questionNumber]}">
+                        <option value="">Select Attribute</option>
+                        {% for attribute_name in attribute_names %}
+                        <option value="{{ attribute_name }}">{{ attribute_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="answer_weight${questionNumber}_${answerCounters[questionNumber]}">Weight:</label>
+                    <input type="number" step="any" class="form-control" name="answer_weight${questionNumber}_${answerCounters[questionNumber]}" required>
+                </div>
                 <button type="button" onclick="removeAnswerField('answerDiv${questionNumber}_${answerCounters[questionNumber]}')">Remove Answer</button>
             `;
             answersContainer.appendChild(answerDiv);
@@ -59,7 +73,8 @@
             alert('You can add up to 6 answers per question.');
         }
     }
-    
+
+
     function removeQuestionField(divId) {
         document.getElementById(divId).remove();
     }

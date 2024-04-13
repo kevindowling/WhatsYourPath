@@ -45,6 +45,14 @@
                 <input type="number" step="any" class="form-control" name="attribute_threshold${attributeThresholdCounter}" required>
             </div>
             <div class="form-group">
+                <label for="left_code_string${attributeThresholdCounter}">Code for not meeting threshold:</label>
+                <input type="text" class="form-control" name="left_code_string${attributeThresholdCounter}" required>
+            </div>
+            <div class="form-group">
+                <label for="right_code_string${attributeThresholdCounter}">Code for meeting threshold:</label>
+                <input type="text" class="form-control" name="right_code_string${attributeThresholdCounter}" required>
+            </div>
+            <div class="form-group">
                 <label for="threshold_description${attributeThresholdCounter}">Threshold Description:</label>
                 <textarea class="form-control" name="threshold_description${attributeThresholdCounter}" rows="2"></textarea>
             </div>
