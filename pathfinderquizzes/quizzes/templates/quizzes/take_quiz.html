@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ quiz.Title }}</h2>
+<p>{{ quiz.Description }}</p>
+
+{% if question %}
+    <h3>Question: {{ question.Text }}</h3>
+    <form action="{% url 'submit_answer' quiz.QuizID question.QuestionID question_index%}" method="post">
+        {% csrf_token %}
+        <ul>
+            {% for answer in answers %}
+            <li>
+                <label>
+                    <input type="radio" name="selected_answer" value="{{ answer.AnswerID }}" required>
+                    {{ answer.Text }}
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Submit Answer</button>
+    </form>
+{% else %}
+    <p>No questions available for this quiz.</p>
+{% endif %}
+{% endblock %}
