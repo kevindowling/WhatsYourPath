@@ -20,54 +20,79 @@
     let outcomeCodeCounter = 0;
 
     function addOutcomeCodeField() {
-        outcomeCodeCounter++;
+        
         let container = document.getElementById('outcome-codes-container');
         let outcomeCodeDiv = document.createElement('div');
-        outcomeCodeDiv.setAttribute('id', 'outcomeCodeDiv' + outcomeCodeCounter);
+        outcomeCodeDiv.setAttribute('id', 'outcome_code' + outcomeCodeCounter);
         outcomeCodeDiv.innerHTML = `
             <hr>
             <div class="form-group">
-                <label for="combination_code${outcomeCodeCounter}">Combination Code:</label>
-                {% for attribute_name_codes in attribute_names_codes %}
-                    <h4> {{ attribute_name_codes.0 }}
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                        <label class="form-check-label" for="flexSwitchCheckDefault">
-                            <span class="label-on">{{ attribute_name_codes.1 }}</span>
-                            <span class="label-off">{{ attribute_name_codes.2 }}</span>
-                        </label>
-                    </div>
+                <label for="combination_code${outcomeCodeCounter}" id="combination_code_div_label${outcomeCodeCounter}">Combination Code:</label>
+                <div name="combination_code_div${outcomeCodeCounter}"
+                    
+                    {% for attribute_name_codes in attribute_names_codes %}
+                        <h4 id="attribute_name${outcomeCodeCounter}"> {{ attribute_name_codes.0 }}
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}" onchange="updateCombinationCode(${outcomeCodeCounter})">
+                            <label class="form-check-label outputcodeLabel${outcomeCodeCounter}" id="label_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}" for="flexSwitchCheckDefault_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}">
+                                <span class="label-on" id="labelOn_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}">{{ attribute_name_codes.1 }}</span>
+                                <span class="label-off" id="labelOff_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}">{{ attribute_name_codes.2 }}</span>
+                            </label>
+                            <style>
+                                /* Hide the label-off text by default */
+                                .label-off {
+                                    display: none;
+                                }
 
-                {% endfor %}
+                                /* When the checkbox is not checked, hide label-on and show label-off */
+                                #flexSwitchCheckDefault_{{ attribute_name_codes.0}}_${outcomeCodeCounter}:not(:checked) ~ .form-check-label .label-on {
+                                    display: none;
+                                }
+
+                                #flexSwitchCheckDefault_{{ attribute_name_codes.0 }}_${outcomeCodeCounter}:not(:checked) ~ .form-check-label .label-off {
+                                    display: inline;
+                                }
+                            </style>
+                        </div>
+                        
+                    {% endfor %}
+                    
+                    <input type="hidden" id="combination_code${outcomeCodeCounter}" name="combination_code${outcomeCodeCounter}" value="" ">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="description${outcomeCodeCounter}">Description:</label>
                 <textarea class="form-control" name="description${outcomeCodeCounter}" rows="3" required></textarea>
             </div>
-            <button type="button" onclick="removeOutcomeCodeField('outcomeCodeDiv${outcomeCodeCounter}')">Remove Outcome Code</button>
-            <style>
-                /* Hide the label-off text by default */
-                .label-off {
-                    display: none;
-                }
+            <button type="button" onclick="removeOutcomeCodeField('outcome_code${outcomeCodeCounter}')">Remove Outcome Code</button>
 
-                /* When the checkbox is not checked, hide label-on and show label-off */
-                #flexSwitchCheckDefault:not(:checked) ~ .form-check-label .label-on {
-                    display: none;
-                }
 
-                #flexSwitchCheckDefault:not(:checked) ~ .form-check-label .label-off {
-                    display: inline;
-                }
-            </style>
+            
         `;
         container.appendChild(outcomeCodeDiv);
+        updateCombinationCode(outcomeCodeCounter);
+        outcomeCodeCounter++;
+        
     }
 
     function removeOutcomeCodeField(divId) {
         document.getElementById(divId).remove();
     }
+
+    function updateCombinationCode(outcomeCodeCounter) {
+        let code = "";
+        const labels = document.querySelectorAll('.outputcodeLabel'+outcomeCodeCounter);
+        labels.forEach(label => {
+            code += label.innerText;
+        });
+
+
+        document.getElementById("combination_code" + outcomeCodeCounter).value = code;
+    }
+
+
+
 </script>
 
 {% endblock %}

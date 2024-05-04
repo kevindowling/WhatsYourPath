@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import Quiz, QuizCategory, AnswerAttribute, AttributeThreshold, Question, Answer
+from .models import OutcomeCode, Quiz, QuizCategory, AnswerAttribute, AttributeThreshold, Question, Answer
 from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse
@@ -12,7 +12,6 @@ def create_quiz(request):
     categories = QuizCategory.objects.all()
     context = {'categories': categories}
     if request.method == 'POST':
-        logger.debug("Create Quiz: POST")
         title = request.POST.get('title')
         description = request.POST.get('description')
         quiz_category_id = request.POST.get('quiz_category_id')
@@ -26,7 +25,6 @@ def create_quiz(request):
         )        
         categories = QuizCategory.objects.all()
         context['quiz_id']= quiz.pk
-        logger.debug('Quiz ID passed from create quiz: %s', quiz.pk)
         return render(request, 'quizmaker/add_attribute_threshold.html', context)
     else:
         return render(request, 'quizmaker/create_quiz.html')
@@ -35,7 +33,6 @@ def create_quiz(request):
 def submit_attribute_thresholds(request):
     if request.method == 'POST':
         quiz_id = request.POST.get('quiz_id')
-        logger.debug('Quiz ID recieved from create quiz: %s', quiz_id)
         quiz = Quiz.objects.get(pk=quiz_id)
         attribute_names_codes = []
         for key in request.POST:
@@ -70,10 +67,39 @@ def submit_attribute_thresholds(request):
 def submit_outcome_codes(request):
     if request.method == 'POST':
         quiz_id = request.POST.get('quiz_id')
-        #quiz = Quiz.objects.get(pk=quiz_id)
+        quiz = Quiz.objects.get(pk=quiz_id)  # Ensure the Quiz object exists.
+        attribute_thresholds = AttributeThreshold.objects.filter(Quiz=quiz)
+        attribute_names = [at.AttributeName for at in attribute_thresholds]
+        logger.info("Request POST: %s", request.POST)
+        logger.info("Submitting Outcome Codes: ")
 
-        #Create OutcomeCode Objects.
-    return redirect('quizmaker/add_questions.html', { 'quiz_id': quiz_id }) 
+        # Process each dynamically added outcome code
+        outcome_code_counter = 0
+        while True:
+            # Check if there is another set of outcome code data in the POST data
+            combination_code = request.POST.get(f'combination_code{outcome_code_counter}')
+            logger.info("combination_code_key: %s", combination_code)
+            if combination_code:
+
+                description = request.POST.get(f'description{outcome_code_counter}')
+                # Save the OutcomeCode to the database, with the constructed combination code.
+                outcome_code = OutcomeCode.objects.create(
+                    Quiz=quiz, 
+                    Description=description, 
+                    CombinationCode=combination_code,
+                    )
+                logger.debug("Created Outcome Code: desc-%s, cc-%s", description, combination_code)
+            else:
+                break
+            outcome_code_counter += 1
+
+    context = {
+        'quiz_id': quiz_id,
+        'attribute_names':attribute_names
+    }
+
+
+    return render(request, 'quizmaker/add_questions.html',  context ) 
 
 @login_required
 def submit_questions(request):
