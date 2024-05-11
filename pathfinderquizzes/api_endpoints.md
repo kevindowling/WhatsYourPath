@@ -1,85 +1,56 @@
+# Quiz Platform API Endpoints
 
-## API Endpoints with Data Types and Simplified Responses
+## Categories
+- **GET /categories/**: Retrieve a list of all quiz categories.
+- **GET /categories/{id}/**: Retrieve a specific quiz category by its ID.
+- **POST /categories/**: Create a new quiz category.
+- **PUT /categories/{id}/**: Update an existing quiz category.
+- **DELETE /categories/{id}/**: Delete a specific quiz category.
 
-### Getting All Published Quizzes
-- **Endpoint:** `GET /api/quizzes/published`
-- **Function:** Retrieves all published quizzes, returning only quiz names, descriptions, categories, and IDs.
-- **Returns:** JSON array of objects with `QuizID`, `Title`, and `Description`.
+## Quizzes
+- **GET /quizzes/**: Retrieve all quizzes.
+- **GET /quizzes/{id}/**: Retrieve details of a specific quiz.
+- **POST /quizzes/**: Create a new quiz.
+- **PUT /quizzes/{id}/**: Update an existing quiz.
+- **DELETE /quizzes/{id}/**: Delete a specific quiz.
 
-### Getting All Quiz Categories
-- **Endpoint:** `GET /api/quiz-categories`
-- **Function:** Retrieves a list of all unique quiz categories.
-- **Returns:** JSON array of strings representing the unique categories.
+## Questions
+- **GET /quizzes/{quiz_id}/questions/**: Retrieve all questions for a specific quiz.
+- **GET /quizzes/{quiz_id}/questions/{question_id}/**: Retrieve a specific question within a quiz.
+- **POST /quizzes/{quiz_id}/questions/**: Add a new question to a quiz.
+- **PUT /quizzes/{quiz_id}/questions/{question_id}/**: Update a question in a quiz.
+- **DELETE /quizzes/{quiz_id}/questions/{question_id}/**: Remove a question from a quiz.
 
-### Getting Published Quizzes by Category
-- **Endpoint:** `GET /api/quizzes/published/{category}`
-- **Function:** Retrieves all published quizzes for a specific category, returning quiz names, descriptions, and IDs.
-- **Parameters:** `category` - The category of the quizzes to retrieve.
-- **Returns:** JSON array of objects with `QuizID`, `Title`, and `Description`.
+## Answers
+- **GET /questions/{question_id}/answers/**: Retrieve all answers for a specific question.
+- **GET /questions/{question_id}/answers/{answer_id}/**: Retrieve details of a specific answer.
+- **POST /questions/{question_id}/answers/**: Create a new answer for a question.
+- **PUT /questions/{question_id}/answers/{answer_id}/**: Update an existing answer.
+- **DELETE /questions/{question_id}/answers/{answer_id}/**: Delete an answer.
 
-### Getting Quiz Details by ID
-- **Endpoint:** `GET /api/quizzes/{quizId}`
-- **Function:** Retrieves detailed information about a specific quiz, including questions and answer options.
-- **Parameters:** `quizId` - The ID of the quiz to retrieve.
-- **Returns:** JSON object with quiz details, including `QuizID`, `Title`, `Description`, `Category`, `Questions` (with `QuestionID`, `Text`, `QuestionType`, `Answers`).
+## User Quiz Attempts
+- **GET /users/{user_id}/attempts/**: List all quiz attempts by a specific user.
+- **GET /users/{user_id}/attempts/{attempt_id}/**: Retrieve details of a specific quiz attempt.
+- **POST /quizzes/{quiz_id}/attempt/**: Start a new quiz attempt for a user.
+- **PUT /users/{user_id}/attempts/{attempt_id}/**: Update a quiz attempt (e.g., mark as completed).
+- **DELETE /users/{user_id}/attempts/{attempt_id}/**: Delete a quiz attempt.
 
-### Submitting Quiz Answers
-- **Endpoint:** `POST /api/quizzes/{quizId}/submit`
-- **Function:** Receives the user's answers for a quiz, calculates the result based on answer attributes, and returns the calculated result.
-- **Parameters:** `quizId` - The ID of the quiz being attempted.
-- **Body:** JSON object containing `UserID`, `Answers` (array of objects with `QuestionID` and `AnswerID`).
-- **Returns:** JSON object with the result, including `ResultName`, `ResultDescription`, and any additional advice or recommendations.
+## User Answers
+- **POST /attempts/{attempt_id}/answers/**: Submit an answer for a question in a quiz attempt.
+- **PUT /attempts/{attempt_id}/answers/{user_answer_id}/**: Update an answer previously submitted in a quiz attempt.
+- **DELETE /attempts/{attempt_id}/answers/{user_answer_id}/**: Delete a submitted answer.
 
-## Creating a Quiz
-- **Endpoint:** `POST /api/quizzes`
-- **Function:** Allows users to create a new quiz.
-- **Authorization:** Bearer token required to validate the user.
-- **Body:** JSON object containing `Title`, `Description`, `Category`, and `IsPublished` status.
-- **Returns:** JSON object with the newly created `QuizID`, `Title`, `Description`, and `IsPublished` status.
+## Attribute Thresholds
+- **GET /quizzes/{quiz_id}/thresholds/**: Retrieve all attribute thresholds for a quiz.
+- **POST /quizzes/{quiz_id}/thresholds/**: Define a new attribute threshold for a quiz.
+- **PUT /quizzes/{quiz_id}/thresholds/{threshold_id}/**: Update an existing attribute threshold.
+- **DELETE /quizzes/{quiz_id}/thresholds/{threshold_id}/**: Delete an attribute threshold.
 
-## Adding a Question to User's Quiz
-- **Endpoint:** `POST /api/quizzes/{quizId}/questions`
-- **Function:** Allows users to add a new question to one of their quizzes.
-- **Authorization:** Bearer token required. Verifies that the quiz belongs to the user.
-- **Parameters:** `quizId` - The ID of the user's quiz to which the question will be added.
-- **Body:** JSON object containing `Text`, `QuestionType`, and `Sequence`.
-- **Returns:** JSON object with the newly added `QuestionID`, `Text`, `QuestionType`, and `Sequence`.
+## Outcome Codes
+- **GET /quizzes/{quiz_id}/outcomes/**: Retrieve all outcome codes for a quiz.
+- **POST /quizzes/{quiz_id}/outcomes/**: Create a new outcome code with a specific combination of attribute thresholds.
+- **PUT /quizzes/{quiz_id}/outcomes/{outcome_code_id}/**: Update an existing outcome code.
+- **DELETE /quizzes/{quiz_id}/outcomes/{outcome_code_id}/**: Delete an outcome code.
 
-## Adding an AnswerAttribute to an Answer from User's Quiz
-- **Endpoint:** `POST /api/quizzes/{quizId}/questions/{questionId}/answers/{answerId}/attributes`
-- **Function:** Allows users to add an attribute to an answer in one of their quizzes.
-- **Authorization:** Bearer token required. Verifies that the quiz and question belong to the user.
-- **Parameters:** 
-    - `quizId` - The ID of the user's quiz.
-    - `questionId` - The ID of the question within the quiz.
-    - `answerId` - The ID of the answer to which the attribute will be added.
-- **Body:** JSON object containing `AttributeName` and `Weight`.
-- **Returns:** JSON object with the newly added `AttributeID`, `AttributeName`, and `Weight`.
-
-## Adding an AttributeThreshold to User's Quiz
-- **Endpoint:** `POST /api/quizzes/{quizId}/attributes/thresholds`
-- **Function:** Allows users to add an attribute threshold to one of their quizzes.
-- **Authorization:** Bearer token required. Verifies that the quiz belongs to the user.
-- **Parameters:** `quizId` - The ID of the user's quiz.
-- **Body:** JSON object containing `AttributeName`, `ThresholdValue`, `Description`, and `GradingInstruction`.
-- **Returns:** JSON object with the newly added `AttributeThresholdID`, `AttributeName`, `ThresholdValue`, `Description`, and `GradingInstruction`.
-
-## Updating an AttributeThreshold of User's Quiz
-- **Endpoint:** `PUT /api/quizzes/{quizId}/attributes/thresholds/{thresholdId}`
-- **Function:** Allows users to update an attribute threshold in one of their quizzes.
-- **Authorization:** Bearer token required. Verifies that the quiz belongs to the user.
-- **Parameters:** 
-    - `quizId` - The ID of the user's quiz.
-    - `thresholdId` - The ID of the attribute threshold to be updated.
-- **Body:** JSON object containing any of `ThresholdValue`, `Description`, and `GradingInstruction` to be updated.
-- **Returns:** JSON object with the updated `AttributeThresholdID`, `AttributeName`, `ThresholdValue`, `Description`, and `GradingInstruction`.
-
-## Removing a Question from User's Quiz
-- **Endpoint:** `DELETE /api/quizzes/{quizId}/questions/{questionId}`
-- **Function:** Allows users to remove a question from one of their quizzes.
-- **Authorization:** Bearer token required. Verifies that the quiz and question belong to the user.
-- **Parameters:** 
-    - `quizId` - The ID of the user's quiz.
-    - `questionId` - The ID of the question to be removed.
-- **Returns:** A status message indicating the question has been successfully removed.
-
+## Admin
+- **GET /admin/reports/**: Generate and retrieve reports (e.g., quiz statistics, user performance).

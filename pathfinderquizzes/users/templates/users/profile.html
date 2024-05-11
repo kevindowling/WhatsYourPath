@@ -3,4 +3,31 @@
 {% block content %}
 <h1>User Profile</h1>
 <p>Welcome, {{ request.user.username }}!</p>
+
+<!-- Hidden input to securely store the token for JavaScript access -->
+<input type="hidden" id="apiToken" value="{{ token }}">
+
+
+    <button id="apiAccessBtn">Copy API Token</button>
+
+
+
+<script>
+document.getElementById('apiAccessBtn').addEventListener('click', function() {
+    var token = document.getElementById('apiToken').value; // Get the token from hidden input
+    navigator.clipboard.writeText(token).then(function() {
+        console.log('Token copied to clipboard');
+
+        alert('API Token copied to clipboard!'); // Provide user feedback
+    }, function(err) {
+        console.error('Could not copy token: ', err);
+        alert('Failed to copy token.');
+    });
+});
+</script>
+<!-- [TODO] give user feedback -->
+<form action="{% url 'regenerate_token' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Regenerate Token</button> 
+</form>
 {% endblock %}

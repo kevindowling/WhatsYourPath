@@ -6,6 +6,15 @@ from quizmaker.models import Quiz, Question, Answer, AttributeThreshold, AnswerA
 from django.utils import timezone
 import logging
 
+## API ##
+from rest_framework.generics import ListAPIView
+from quizmaker.models import Quiz
+from quizmaker.serializers import QuizSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
 logger = logging.getLogger('myapp.custom')
 
 # Create your views here.
@@ -124,3 +133,21 @@ def submit_quiz(request, attempt_id):
     return outcome_code.Description
     
 
+## API ##
+class QuizListView(ListAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })

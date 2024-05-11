@@ -4,8 +4,15 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.http import HttpResponse
 from django.contrib import messages
+from .serializers import QuizSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
 
 logger = logging.getLogger('myapp.custom')
+permissions_classes = [permissions.IsAuthenticated]
+
 
 @login_required
 def create_quiz(request):
@@ -150,3 +157,5 @@ def submit_questions(request):
 
     else:
         return redirect('create_quiz')
+
+
