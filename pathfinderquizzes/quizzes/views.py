@@ -7,13 +7,13 @@ from django.utils import timezone
 import logging
 
 ## API ##
-from rest_framework.generics import ListAPIView
-from quizmaker.models import Quiz
-from quizmaker.serializers import QuizSerializer
+from rest_framework import status
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from quizmaker.serializers import QuizSerializer, QuestionSerializer, UserQuizAttemptSerializer
 
 logger = logging.getLogger('myapp.custom')
 
@@ -139,6 +139,70 @@ class QuizListView(ListAPIView):
     serializer_class = QuizSerializer
     permission_classes = [IsAuthenticated]
 
+class QuizDetailView(RetrieveAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        quiz = self.get_object()
+        quiz_data = QuizSerializer(quiz).data
+        questions = Question.objects.filter(Quiz=quiz)
+        questions_data = QuestionSerializer(questions, many=True).data
+        quiz_data['questions'] = questions_data
+        return Response(quiz_data)
+
+class UserQuizAttemptCreateView(CreateAPIView):
+    queryset = UserQuizAttempt.objects.all()
+    serializer_class = UserQuizAttemptSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(User=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data['StartedAt'] = timezone.now()
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        quiz_attempt = serializer.save(User=request.user)
+
+        # Grading the attempt
+        attribute_threshold_values_dict = {}
+        user_answers = UserAnswer.objects.filter(Attempt=quiz_attempt)
+        for user_answer in user_answers:
+            for attr in user_answer.Answer.answerattribute_set.all():
+                if attr.AttributeName not in attribute_threshold_values_dict:
+                    attribute_threshold_values_dict[attr.AttributeName] = attr.Weight
+                else:
+                    attribute_threshold_values_dict[attr.AttributeName] += attr.Weight
+
+        # Compare with thresholds
+        attribute_thresholds = AttributeThreshold.objects.filter(Quiz=quiz_attempt.Quiz)
+        for attribute_threshold in attribute_thresholds:
+            if attribute_threshold.AttributeName in attribute_threshold_values_dict:
+                if attribute_threshold_values_dict[attribute_threshold.AttributeName] < attribute_threshold.ThresholdValue:
+                    attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.RightCodeString
+                else:
+                    attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.LeftCodeString
+
+        combination_code_str = ''.join(attribute_threshold_values_dict.values())
+
+        try:
+            outcome_code = OutcomeCode.objects.get(Quiz=quiz_attempt.Quiz, CombinationCode=combination_code_str)
+        except OutcomeCode.DoesNotExist:
+            outcome_code = None
+
+        quiz_attempt.CompletedAt = timezone.now()
+        quiz_attempt.save()
+
+        response_data = {
+            'quiz_attempt': UserQuizAttemptSerializer(quiz_attempt).data,
+            'outcome': outcome_code.Description if outcome_code else "No outcome code found"
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
+        
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,

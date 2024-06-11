@@ -7,25 +7,55 @@
 <!-- Hidden input to securely store the token for JavaScript access -->
 <input type="hidden" id="apiToken" value="{{ token }}">
 
+<button id="apiAccessBtn">Copy API Token</button>
 
-    <button id="apiAccessBtn">Copy API Token</button>
-
-
+<!-- Button to go to the quizzes page -->
+<button id="goToQuizzesBtn">Go to Quizzes</button>
 
 <script>
 document.getElementById('apiAccessBtn').addEventListener('click', function() {
     var token = document.getElementById('apiToken').value; // Get the token from hidden input
     navigator.clipboard.writeText(token).then(function() {
         console.log('Token copied to clipboard');
-
         alert('API Token copied to clipboard!'); // Provide user feedback
     }, function(err) {
         console.error('Could not copy token: ', err);
         alert('Failed to copy token.');
     });
 });
+
+document.getElementById('goToQuizzesBtn').addEventListener('click', function() {
+    var token = document.getElementById('apiToken').value; // Get the token from hidden input
+    var quizzesUrl = '/quizzes/api/quizzes/';
+    
+    fetch(quizzesUrl, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        // Redirect to a new page or display the quizzes on the current page
+        // For example, you could create a new HTML element to display the quizzes
+        var quizzesList = document.createElement('ul');
+        data.forEach(quiz => {
+            var quizItem = document.createElement('li');
+            console.log(quiz.QuizID);
+            quizItem.innerHTML = `<h3>${quiz.Title}</h3><p>${quiz.Description}</p><a href="/quizzes/${quiz.QuizID}/">View this quiz</a>`;
+            quizzesList.appendChild(quizItem);
+        });
+        document.body.appendChild(quizzesList);
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+
+
+
 </script>
-<!-- [TODO] give user feedback -->
+
 <form action="{% url 'regenerate_token' %}" method="post">
     {% csrf_token %}
     <button type="submit">Regenerate Token</button> 
