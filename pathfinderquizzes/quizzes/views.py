@@ -102,17 +102,16 @@ def submit_quiz(request, attempt_id):
     attribute_thresholds = AttributeThreshold.objects.filter(Quiz=quiz_attempt.Quiz)
     attribute_threshold_values_dict = {}
     for attribute_threshold in attribute_thresholds:
-        attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.ThresholdValue
+        attribute_threshold_values_dict[attribute_threshold.AttributeName] = 0
 
     user_answers = UserAnswer.objects.filter(Attempt=quiz_attempt)
 
     for user_answer in user_answers: 
         answer_attributes = AnswerAttribute.objects.filter(Answer=user_answer.Answer)
         for answer_attribute in answer_attributes:
-            attribute_threshold_values_dict[answer_attribute.AttributeName] -= answer_attribute.Weight
-
+            attribute_threshold_values_dict[answer_attribute.AttributeName] += answer_attribute.Weight
     for attribute_threshold in attribute_thresholds:
-        if(attribute_threshold_values_dict[attribute_threshold.AttributeName] < attribute_threshold.ThresholdValue):
+        if(attribute_threshold_values_dict[attribute_threshold.AttributeName] >= attribute_threshold.ThresholdValue):
             attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.RightCodeString
         else: 
             attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.LeftCodeString
@@ -121,21 +120,24 @@ def submit_quiz(request, attempt_id):
 
     
  
-
+    outcome_description = 'You took a quiz... And we\'re not sure what the result was. The quiz\'s creator didn\'t tell us what to do if you got this far..'
     try:
         outcome_code = OutcomeCode.objects.get(Quiz=quiz_attempt.Quiz, CombinationCode=combination_code_str)
+        outcome_description = outcome_code.Description
     except OutcomeCode.DoesNotExist:
             logger.debug("No outcome code found for the given quiz and combination code.")
+            
 
 
     quiz_attempt.CompletedAt = timezone.now()
 
-    return outcome_code.Description
+    return outcome_description
     
 
 ## API ##
 class QuizListView(ListAPIView):
-    queryset = Quiz.objects.all()
+    
+    queryset = Quiz.objects.filter(IsPublished=True)  # Only return published quizzes
     serializer_class = QuizSerializer
     permission_classes = [IsAuthenticated]
 
