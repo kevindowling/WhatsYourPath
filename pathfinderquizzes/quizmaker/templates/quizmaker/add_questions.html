@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1>Add Questions and Answers</h1>
-    <form method="post" action="{% url 'submit_questions' %}">  <!-- You will need to create this URL in urls.py -->
+    <form method="post" action="{% url 'submit_questions' %}"> 
       {% csrf_token %}
         <input type="hidden" name="quiz_id" value="{{ quiz_id }}">
         <div id="questions-container">
@@ -55,22 +55,33 @@
                 </div>
                 <div class="form-group">
                     <label for="answer_attribute${questionNumber}_${answerCounters[questionNumber]}">Attribute:</label>
-                    <select class="form-control" name="answer_attribute${questionNumber}_${answerCounters[questionNumber]}">
+                    <select class="form-control" name="answer_attribute${questionNumber}_${answerCounters[questionNumber]}" id="answer_attribute${questionNumber}_${answerCounters[questionNumber]}" onchange="toggleWeightField(${questionNumber}, ${answerCounters[questionNumber]})">
                         <option value="">Select Attribute</option>
                         {% for attribute_name in attribute_names %}
                         <option value="{{ attribute_name }}">{{ attribute_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="weight_field${questionNumber}_${answerCounters[questionNumber]}" style="display: none;">
                     <label for="answer_weight${questionNumber}_${answerCounters[questionNumber]}">Weight:</label>
-                    <input type="number" step="any" class="form-control" name="answer_weight${questionNumber}_${answerCounters[questionNumber]}" required>
+                    <input type="number" step="any" class="form-control" name="answer_weight${questionNumber}_${answerCounters[questionNumber]}" value="0">
                 </div>
                 <button type="button" onclick="removeAnswerField('answerDiv${questionNumber}_${answerCounters[questionNumber]}')">Remove Answer</button>
             `;
             answersContainer.appendChild(answerDiv);
         } else {
             alert('You can add up to 6 answers per question.');
+        }
+    }
+
+    function toggleWeightField(questionNumber, answerCounter) {
+        var selectElement = document.getElementById('answer_attribute' + questionNumber + '_' + answerCounter);
+        var weightField = document.getElementById('weight_field' + questionNumber + '_' + answerCounter);
+        console.log(`Selected value for attribute | Question ${questionNumber} | Answer ${answerCounter}`)
+        if (selectElement.value !== "") {
+            weightField.style.display = 'block';
+        } else {
+            weightField.style.display = 'none';
         }
     }
 
