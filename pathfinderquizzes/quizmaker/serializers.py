@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.utils import timezone
 from .models import Quiz, Question, Answer, AnswerAttribute, UserQuizAttempt, UserAnswer, OutcomeCode
+import logging
+
+logger = logging.getLogger('myapp.custom')
 
 class UserAnswerSerializer(serializers.ModelSerializer):
     AnsweredAt = serializers.DateTimeField(required=False)
@@ -40,21 +43,53 @@ class AnswerAttributeSerializer(serializers.ModelSerializer):
         model = AnswerAttribute
         fields = ['AttributeID', 'AttributeName', 'Weight']
 
+
 class AnswerSerializer(serializers.ModelSerializer):
-    attributes = AnswerAttributeSerializer(many=True, read_only=True, source='answerattribute_set')
+    attributes = AnswerAttributeSerializer(many=True)
 
     class Meta:
         model = Answer
         fields = ['AnswerID', 'Text', 'attributes']
 
+
 class QuestionSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True, read_only=True, source='answer_set')
+    answers = AnswerSerializer(many=True)
 
     class Meta:
         model = Question
         fields = ['QuestionID', 'Text', 'CreatedAt', 'QuestionType', 'Sequence', 'answers']
 
+class OutcomeCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OutcomeCode
+        fields = ['OutcomeCodeID', 'CombinationCode', 'Description']
+
 class QuizSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True)
+    outcomecodes = OutcomeCodeSerializer(many=True) 
+    logger.debug("Quiz Serializer called")
     class Meta:
         model = Quiz
-        fields = ['QuizID', 'Title', 'Description', 'QuizCategory', 'CreatedBy', 'CreatedAt', 'IsPublished']
+        fields = ['QuizID', 'Title', 'Description', 'QuizCategory', 'CreatedBy', 'IsPublished', 'questions', 'outcomecodes']
+
+    def create(self, validated_data):
+        questions_data = validated_data.pop('questions')
+        outcomecodes_data = validated_data.pop('outcomecodes', [])
+        quiz = Quiz.objects.create(**validated_data)
+
+        for question_data in questions_data:
+            answers_data = question_data.pop('answers')
+            question = Question.objects.create(Quiz=quiz, **question_data)
+
+            for answer_data in answers_data:
+                attributes_data = answer_data.pop('attributes', [])
+                answer = Answer.objects.create(Question=question, **answer_data)
+
+                for attribute_data in attributes_data:
+                    AnswerAttribute.objects.create(Answer=answer, **attribute_data)
+
+        for outcome_data in outcomecodes_data:
+            OutcomeCode.objects.create(Quiz=quiz, **outcome_data)
+
+        return quiz
+

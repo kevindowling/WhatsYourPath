@@ -145,7 +145,6 @@ class QuizDetailView(RetrieveAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
         quiz = self.get_object()
         quiz_data = QuizSerializer(quiz).data
@@ -172,18 +171,18 @@ class UserQuizAttemptCreateView(CreateAPIView):
         # Grading the attempt
         attribute_threshold_values_dict = {}
         user_answers = UserAnswer.objects.filter(Attempt=quiz_attempt)
+        
         for user_answer in user_answers:
             for attr in user_answer.Answer.answerattribute_set.all():
                 if attr.AttributeName not in attribute_threshold_values_dict:
                     attribute_threshold_values_dict[attr.AttributeName] = attr.Weight
                 else:
                     attribute_threshold_values_dict[attr.AttributeName] += attr.Weight
-
         # Compare with thresholds
         attribute_thresholds = AttributeThreshold.objects.filter(Quiz=quiz_attempt.Quiz)
         for attribute_threshold in attribute_thresholds:
             if attribute_threshold.AttributeName in attribute_threshold_values_dict:
-                if attribute_threshold_values_dict[attribute_threshold.AttributeName] < attribute_threshold.ThresholdValue:
+                if attribute_threshold_values_dict[attribute_threshold.AttributeName] > attribute_threshold.ThresholdValue:
                     attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.RightCodeString
                 else:
                     attribute_threshold_values_dict[attribute_threshold.AttributeName] = attribute_threshold.LeftCodeString

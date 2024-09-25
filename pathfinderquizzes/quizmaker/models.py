@@ -25,7 +25,7 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     QuestionID = models.AutoField(primary_key=True)
-    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    Quiz = models.ForeignKey(Quiz, related_name='questions', on_delete=models.CASCADE)
     Text = models.CharField(max_length=255)
     CreatedAt = models.DateTimeField(auto_now_add=True)
     QuestionType = models.CharField(max_length=50)
@@ -35,14 +35,14 @@ class Question(models.Model):
 
 class Answer(models.Model):
     AnswerID = models.AutoField(primary_key=True)
-    Question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    Question = models.ForeignKey(Question, related_name='answers', on_delete=models.CASCADE)
     Text = models.CharField(max_length=255)
     def __str__(self) -> str:
         return self.Text
 
 class AnswerAttribute(models.Model):
     AttributeID = models.AutoField(primary_key=True)
-    Answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    Answer = models.ForeignKey(Answer, related_name='attributes', on_delete=models.CASCADE)
     AttributeName = models.CharField(max_length=255)
     Weight = models.DecimalField(max_digits=5, decimal_places=2)
     def __str__(self) -> str:
@@ -81,7 +81,7 @@ class AttributeThreshold(models.Model):
 
 class OutcomeCode(models.Model):
     OutcomeCodeID = models.AutoField(primary_key=True)
-    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    Quiz = models.ForeignKey(Quiz, related_name='outcomecodes', on_delete=models.CASCADE)
     CombinationCode = models.CharField(max_length=255, default='', help_text="A code representing the combination of attribute thresholds")
     Description = models.TextField(help_text="A detailed description of what this combination means")
     CreatedAt = models.DateTimeField(auto_now_add=True)

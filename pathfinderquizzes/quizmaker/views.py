@@ -9,6 +9,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import permissions
+from .permissions import IsSpecificUser
+from rest_framework.permissions import IsAuthenticated
+
 
 logger = logging.getLogger('myapp.custom')
 permissions_classes = [permissions.IsAuthenticated]
@@ -159,3 +162,12 @@ def submit_questions(request):
         return redirect('create_quiz')
 
 
+class CreateQuizView(APIView):
+    permission_classes = [IsAuthenticated, IsSpecificUser] 
+
+    def post(self, request, *args, **kwargs):
+        serializer = QuizSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(CreatedBy=request.user) 
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
