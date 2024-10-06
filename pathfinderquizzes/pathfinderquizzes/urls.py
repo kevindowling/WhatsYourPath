@@ -11,5 +11,6 @@ urlpatterns = [
     path('regenerate_token', regenerate_token, name='regenerate_token'),
     path('logout/', logout_view, name='logout'),
     path('quizzes/', include('quizzes.urls')),
+    path('quizwizard/', include('quizagent.urls')),
 ]
 

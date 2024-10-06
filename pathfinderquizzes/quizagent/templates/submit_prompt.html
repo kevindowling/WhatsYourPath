@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Submit Your Prompt</title>
+</head>
+<body>
+    <h1>Submit Your Prompt to ChatGPT</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Prompt</button>
+    </form>
+</body>
+{% endblock %}
