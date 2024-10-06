@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Quiz, Question, Answer, AnswerAttribute, UserQuizAttempt, UserAnswer, OutcomeCode
+from .models import Quiz, Question, Answer, AnswerAttribute, UserQuizAttempt, UserAnswer, OutcomeCode, AttributeThreshold
 import logging
 
 logger = logging.getLogger('myapp.custom')
@@ -59,6 +59,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = ['QuestionID', 'Text', 'CreatedAt', 'QuestionType', 'Sequence', 'answers']
 
+class AttributeThresholdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeThreshold
+        fields = ['AttributeName', 'ThresholdValue', 'Description', 'GradingInstruction', 'LeftCodeString', 'RightCodeString']
+
 class OutcomeCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutcomeCode
@@ -66,15 +71,17 @@ class OutcomeCodeSerializer(serializers.ModelSerializer):
 
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True)
-    outcomecodes = OutcomeCodeSerializer(many=True) 
-    logger.debug("Quiz Serializer called")
+    outcomecodes = OutcomeCodeSerializer(many=True)
+    attributethresholds = AttributeThresholdSerializer(many=True)  # Add this for thresholds
+    
     class Meta:
         model = Quiz
-        fields = ['QuizID', 'Title', 'Description', 'QuizCategory', 'CreatedBy', 'IsPublished', 'questions', 'outcomecodes']
+        fields = ['QuizID', 'Title', 'Description', 'QuizCategory', 'CreatedBy', 'IsPublished', 'questions', 'outcomecodes', 'attributethresholds']  # Include 'attributethresholds'
 
     def create(self, validated_data):
         questions_data = validated_data.pop('questions')
         outcomecodes_data = validated_data.pop('outcomecodes', [])
+        attributethresholds_data = validated_data.pop('attributethresholds', [])  # Pop thresholds data
         quiz = Quiz.objects.create(**validated_data)
 
         for question_data in questions_data:
@@ -91,5 +98,13 @@ class QuizSerializer(serializers.ModelSerializer):
         for outcome_data in outcomecodes_data:
             OutcomeCode.objects.create(Quiz=quiz, **outcome_data)
 
+        for threshold_data in attributethresholds_data:  # Create AttributeThresholds
+            AttributeThreshold.objects.create(Quiz=quiz, **threshold_data)
+
         return quiz
+
+class QuizSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ['QuizID', 'Title', 'Description', 'QuizCategory', 'CreatedBy']
 

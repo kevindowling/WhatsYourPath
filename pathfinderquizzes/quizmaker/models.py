@@ -68,7 +68,7 @@ class UserAnswer(models.Model):
 
 class AttributeThreshold(models.Model):
     AttributeThresholdID = models.AutoField(primary_key=True)
-    Quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    Quiz = models.ForeignKey(Quiz, related_name='attributethresholds', on_delete=models.CASCADE)
     AttributeName = models.CharField(max_length=255)
     ThresholdValue = models.DecimalField(max_digits=5, decimal_places=2)
     Description = models.TextField(null=True, blank=True)

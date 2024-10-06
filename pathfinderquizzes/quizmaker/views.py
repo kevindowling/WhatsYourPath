@@ -163,7 +163,7 @@ def submit_questions(request):
 
 
 class CreateQuizView(APIView):
-    permission_classes = [IsAuthenticated, IsSpecificUser] 
+    permission_classes = [IsAuthenticated] 
 
     def post(self, request, *args, **kwargs):
         serializer = QuizSerializer(data=request.data)

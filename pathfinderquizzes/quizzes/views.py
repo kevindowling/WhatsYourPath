@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from quizmaker.serializers import QuizSerializer, QuestionSerializer, UserQuizAttemptSerializer
+from quizmaker.serializers import QuizSerializer, QuestionSerializer, UserQuizAttemptSerializer, QuizSummarySerializer
 
 logger = logging.getLogger('myapp.custom')
 
@@ -137,9 +137,10 @@ def submit_quiz(request, attempt_id):
 ## API ##
 class QuizListView(ListAPIView):
     
-    queryset = Quiz.objects.filter(IsPublished=True)  # Only return published quizzes
-    serializer_class = QuizSerializer
+    queryset = Quiz.objects.filter(IsPublished=True)  
+    serializer_class = QuizSummarySerializer
     permission_classes = [IsAuthenticated]
+    
 
 class QuizDetailView(RetrieveAPIView):
     queryset = Quiz.objects.all()
