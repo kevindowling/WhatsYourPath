@@ -30,7 +30,7 @@ def take_quiz(request, quiz_id, question_index=0):
     current_question = Question.objects.filter(Quiz=quiz).order_by('Sequence')[question_index]
     # Fetch answers for the first question
     answers = Answer.objects.filter(Question=current_question)
-    
+    # Comment
     attempt = UserQuizAttempt.objects.create(
         Quiz=quiz,
         User=user,
